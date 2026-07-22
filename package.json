@@ -1,0 +1,45 @@
+{
+  "name": "synapseforge",
+  "version": "2.0.0",
+  "private": true,
+  "description": "A production-ready social workspace for feeds, realtime chat, notifications, video, and creator tools.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c blue,magenta \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:client": "vite",
+    "dev:server": "NODE_ENV=development node --env-file-if-exists=.env --watch backend/server.js",
+    "build": "tsc -b && vite build",
+    "start": "NODE_ENV=production node --env-file-if-exists=.env backend/server.js",
+    "test": "NODE_ENV=test node --test backend/**/*.test.js",
+    "check": "npm run lint && npm test && npm run build",
+    "lint": "eslint . --max-warnings=0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "compression": "^1.8.1",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "multer": "^2.2.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^9.2.1",
+    "eslint": "^9.39.2",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.3.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1",
+    "vite": "^8.1.4"
+  }
+}

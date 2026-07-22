@@ -1,0 +1,19 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${HOST_PORT:-3101}:3001"
+    environment:
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:3101}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://127.0.0.1:3101}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-0}
+      SESSION_DAYS: ${SESSION_DAYS:-14}
+    volumes:
+      - synapseforge-data:/app/data
+      - synapseforge-uploads:/app/uploads
+
+volumes:
+  synapseforge-data:
+  synapseforge-uploads:

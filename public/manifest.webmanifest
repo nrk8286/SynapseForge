@@ -1,0 +1,12 @@
+{
+  "name": "SynapseForge",
+  "short_name": "SynapseForge",
+  "description": "A focused place to share, connect, and create.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#111315",
+  "icons": [
+    { "src": "/synapse-mark.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
