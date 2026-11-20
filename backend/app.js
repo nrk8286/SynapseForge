@@ -280,7 +280,7 @@ export function createApplication(options = {}) {
     app.use(express.static(distDir, { index: false, maxAge: production ? '1h' : 0 }))
     app.use((req, res, next) => {
       if (req.method !== 'GET' || req.path.startsWith('/uploads/')) return next()
-      res.sendFile(resolve(distDir, 'index.html'))
+      res.sendFile('index.html', { root: distDir })
     })
   }
 

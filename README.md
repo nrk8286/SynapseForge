@@ -28,6 +28,9 @@ npm run dev
 
 Open `http://127.0.0.1:5173`. The API listens on `http://127.0.0.1:3101`; Vite proxies API, uploads, and WebSocket traffic so the browser uses a single logical origin. Port 3101 avoids the NICK.OS service already installed on port 3001.
 
+On Windows PowerShell, use `Copy-Item .env.example .env` for the first step.
+The npm development, start, and test commands work on Windows as well as Unix.
+
 The application creates `data/synapseforge.db` and `uploads/` on first use. Both paths are ignored by Git.
 
 ## Validation
@@ -63,6 +66,16 @@ docker compose up --build -d
 ```
 
 The Compose service publishes only to `127.0.0.1:3101` by default; override `HOST_PORT` if needed and place a TLS-terminating reverse proxy in front of it. Preserve the `synapseforge-data` and `synapseforge-uploads` volumes in backups. The health probe is `GET /api/health`.
+
+`npm start` runs the Node backend in production mode and serves the built client
+from `dist/`. For PowerShell, set the deployment values with `$env:PUBLIC_ORIGIN`,
+`$env:COOKIE_SECURE`, and `$env:TRUST_PROXY` before starting it.
+
+The Cloudflare `deploy` and `preview` scripts currently publish or serve static
+frontend assets only. They do not run Express, SQLite, uploads, or Socket.IO.
+Use the Node/container deployment above for the complete application. A separate
+static deployment requires an explicitly configured proxy to that Node backend
+for `/api`, `/uploads`, and `/socket.io`, including WebSocket upgrades.
 
 Important production settings:
 
