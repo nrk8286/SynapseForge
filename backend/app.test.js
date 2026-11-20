@@ -1,13 +1,14 @@
 import { after, before, test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createServer } from 'node:http'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createApplication } from './app.js'
 
 const temporaryDirectory = mkdtempSync(join(tmpdir(), 'synapseforge-'))
 const { app, db } = createApplication({
+  production: false,
   databasePath: join(temporaryDirectory, 'test.db'),
   uploadDir: join(temporaryDirectory, 'uploads'),
   distDir: join(temporaryDirectory, 'missing-dist'),
@@ -35,6 +36,29 @@ async function request(path, options = {}) {
   if (options.body && typeof options.body === 'string') headers.set('Content-Type', 'application/json')
   return fetch(`${baseUrl}${path}`, { ...options, headers })
 }
+
+test('serves the built frontend from a workspace inside a hidden parent directory', async () => {
+  const distDir = join(temporaryDirectory, '.workspace', 'dist')
+  mkdirSync(distDir, { recursive: true })
+  writeFileSync(join(distDir, 'index.html'), '<!doctype html><html>SynapseForge fixture</html>')
+  writeFileSync(join(distDir, 'app.js'), 'window.fixture = true;')
+  const application = createApplication({ databasePath: ':memory:', uploadDir: join(temporaryDirectory, 'static-uploads'), distDir, production: true })
+  const staticServer = createServer(application.app)
+  try {
+    await new Promise((resolve) => staticServer.listen(0, '127.0.0.1', resolve))
+    const origin = `http://127.0.0.1:${staticServer.address().port}`
+    for (const route of ['/', '/client-route']) {
+      const response = await fetch(origin + route)
+      assert.equal(response.status, 200)
+      assert.match(await response.text(), /SynapseForge fixture/)
+    }
+    assert.equal((await fetch(origin + '/app.js')).status, 200)
+    assert.equal((await fetch(origin + '/api/not-a-route')).status, 404)
+  } finally {
+    await new Promise((resolve) => staticServer.close(resolve))
+    application.db.close()
+  }
+})
 
 test('health, authentication, feed, upload, notifications, and logout work together', async () => {
   const health = await request('/api/health')

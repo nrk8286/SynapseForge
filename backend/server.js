@@ -2,6 +2,8 @@ import { createServer } from 'node:http'
 import { createApplication } from './app.js'
 import { setupSocket } from './socket.js'
 
+process.env.NODE_ENV = process.argv.includes('--development') ? 'development' : 'production'
+
 const host = process.env.HOST ?? '127.0.0.1'
 const port = Number(process.env.PORT ?? 3101)
 const { app, db, allowedOrigins } = createApplication()
